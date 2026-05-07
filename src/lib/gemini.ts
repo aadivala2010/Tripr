@@ -4,7 +4,7 @@ import {
   type Trip,
   type TripRequest,
 } from "@/lib/types";
-import type { MakCorpsHotelOption } from "@/lib/makcorps";
+import type { SerpApiHotelOption } from "@/lib/serpapi";
 
 const API_KEY =
   process.env.GEMINI_API_KEY ?? "AIzaSyCAp2kl79_KiOTljiPk0IG_tg-LkcZ7-_8";
@@ -213,10 +213,10 @@ async function generateStructuredJson<T>(
   return parser(JSON.parse(text));
 }
 
-function buildHotelContext(hotels: MakCorpsHotelOption[]) {
+function buildHotelContext(hotels: SerpApiHotelOption[]) {
   if (!hotels.length) {
     return `
-No live hotel data is available for this request.
+No live hotel data is available for this exact stay window.
 Create 3 fallback hotel suggestions that fit the budget.
 For fallback hotels:
 - set source to "fallback"
@@ -229,29 +229,29 @@ For fallback hotels:
   const lines = hotels
     .map(
       (hotel, index) =>
-        `${index + 1}. ${hotel.name} | area: ${hotel.area} | vendor: ${hotel.vendor} | market price: ${hotel.price}`,
+        `${index + 1}. ${hotel.name} | area: ${hotel.area} | vendor: ${hotel.vendor} | stay price: ${hotel.price}`,
     )
     .join("\n");
 
   return `
-Live hotel market data from MakCorps free API is available below.
-Important: MakCorps free API provides city-level market pricing from a random future date, not exact selected-stay pricing.
-Use these hotels as market-backed options for the destination and selected travel dates, but do not claim the prices are exact for the user's arrival/departure.
+Live hotel search data from SerpApi Google Hotels is available below.
+Important: These SerpApi results are tied to the selected stay dates and should be treated as live hotel pricing context.
+Use these hotels as date-aware live options for the selected destination and stay window.
 Prefer these hotels for the 3 hotelRecommendations.
 For hotels chosen from this list:
 - set source to "live"
 - keep vendor populated
-- keep price grounded in the provided market price text
+- keep price grounded in the provided live price text
 - keep the hotel name unchanged
 
-Available live hotels:
+Available live date-based hotels:
 ${lines}
 `.trim();
 }
 
 export async function generateTripFromPrompt(
   input: TripRequest,
-  liveHotels: MakCorpsHotelOption[],
+  liveHotels: SerpApiHotelOption[],
 ) {
   const budgetInfo = getBudgetGuidance(input.budget);
   const hotelContext = buildHotelContext(liveHotels);
@@ -321,3 +321,4 @@ Rules:
 
   return generateStructuredJson(prompt, chatResponseJsonSchema, chatResponseSchema.parse);
 }
+

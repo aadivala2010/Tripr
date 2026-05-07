@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 
 import { generateTripFromPrompt } from "@/lib/gemini";
-import { lookupMakCorpsHotels } from "@/lib/makcorps";
+import { lookupSerpApiHotels } from "@/lib/serpapi";
 import { tripRequestSchema } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const input = tripRequestSchema.parse(body);
-    const liveHotels = await lookupMakCorpsHotels(input.location);
+    const liveHotels = await lookupSerpApiHotels(
+      input.location,
+      input.arrivalDate,
+      input.departureDate,
+    );
     const result = await generateTripFromPrompt(input, liveHotels);
 
     return NextResponse.json(result);
