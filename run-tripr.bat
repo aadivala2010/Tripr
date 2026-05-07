@@ -31,7 +31,7 @@ if errorlevel 1 (
 if not exist ".env.local" (
   echo Creating .env.local...
   (
-    echo GEMINI_API_KEY=AIzaSyCAp2kl79_KiOTljiPk0IG_tg-LkcZ7-_8
+    echo GEMINI_API_KEY=AIzaSyCRYJh9Kk6Pvsq3P9uV8naLMV2XcgYf2E4
   ) > ".env.local"
   echo.
 )
@@ -73,4 +73,5 @@ echo Keep this window open while using the app.
 echo.
 
 call cmd /k "cd /d ""%cd%"" && corepack pnpm dev"
+
 

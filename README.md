@@ -13,7 +13,7 @@ pnpm install
 2. Create `.env.local`:
 
 ```bash
-GEMINI_API_KEY=AIzaSyCAp2kl79_KiOTljiPk0IG_tg-LkcZ7-_8
+GEMINI_API_KEY=AIzaSyCRYJh9Kk6Pvsq3P9uV8naLMV2XcgYf2E4
 GEMINI_MODEL=gemini-2.5-flash-lite
 SERPAPI_API_KEY=your_serpapi_key
 ```
@@ -35,3 +35,4 @@ pnpm dev
 - Local trip persistence with `localStorage`
 - Expandable day cards and per-activity visited tracking
 - Mobile-first premium UI ready for Vercel deployment
+

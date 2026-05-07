@@ -7,7 +7,7 @@ import {
 import type { SerpApiHotelOption } from "@/lib/serpapi";
 
 const API_KEY =
-  process.env.GEMINI_API_KEY ?? "AIzaSyCAp2kl79_KiOTljiPk0IG_tg-LkcZ7-_8";
+  process.env.GEMINI_API_KEY ?? "AIzaSyCRYJh9Kk6Pvsq3P9uV8naLMV2XcgYf2E4";
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite";
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
@@ -321,4 +321,5 @@ Rules:
 
   return generateStructuredJson(prompt, chatResponseJsonSchema, chatResponseSchema.parse);
 }
+
 
