@@ -1,0 +1,76 @@
+@echo off
+setlocal
+title Tripr Launcher
+
+cd /d "%~dp0"
+
+echo =====================================
+echo Starting Tripr from:
+echo %cd%
+echo =====================================
+echo.
+
+where node >nul 2>nul
+if errorlevel 1 (
+  echo Node.js is not installed or is not on PATH.
+  echo Install Node.js, then try again.
+  echo.
+  pause
+  exit /b 1
+)
+
+where corepack >nul 2>nul
+if errorlevel 1 (
+  echo Corepack is not available on PATH.
+  echo Reinstall or update Node.js, then try again.
+  echo.
+  pause
+  exit /b 1
+)
+
+if not exist ".env.local" (
+  echo Creating .env.local...
+  (
+    echo GEMINI_API_KEY=AIzaSyCAp2kl79_KiOTljiPk0IG_tg-LkcZ7-_8
+  ) > ".env.local"
+  echo.
+)
+
+set "NEEDS_INSTALL=0"
+
+if not exist "node_modules" (
+  set "NEEDS_INSTALL=1"
+)
+
+if not exist "node_modules\next\dist\bin\next" (
+  set "NEEDS_INSTALL=1"
+)
+
+if "%NEEDS_INSTALL%"=="1" (
+  echo Repairing dependencies...
+
+  if exist "node_modules" (
+    rmdir /s /q "node_modules"
+  )
+
+  if exist ".next" (
+    rmdir /s /q ".next"
+  )
+
+  call cmd /c corepack pnpm install
+  if errorlevel 1 (
+    echo.
+    echo Dependency repair failed.
+    echo.
+    pause
+    exit /b 1
+  )
+  echo.
+)
+
+echo Launching Tripr on http://localhost:3000
+echo Keep this window open while using the app.
+echo.
+
+call cmd /k "cd /d ""%cd%"" && corepack pnpm dev"
+
