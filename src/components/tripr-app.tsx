@@ -262,7 +262,7 @@ export function TriprApp() {
     setHasEnteredApp(true);
 
     if (!stayLength) {
-      setErrorMessage("Departure must be after arrival.");
+      setErrorMessage("Departure must be on or after arrival.");
       return;
     }
 
@@ -473,71 +473,90 @@ export function TriprApp() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 pt-4 sm:px-5 lg:px-8">
-      <div className="soft-card mb-3 flex items-center justify-between rounded-[1.3rem] px-4 py-3 backdrop-blur-xl transition-all duration-300">
-        <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-muted">Tripr App</p>
-          <p className="mt-1 text-sm text-foreground">Plan and chat through your itinerary.</p>
-        </div>
-        {showPlanner ? (
-          <button
-            type="button"
-            onClick={() => setShowPlanner(false)}
-            className="rounded-full border border-line bg-white/70 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-white"
-          >
-            Hide planner
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={openPlanner}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white/70 text-xl leading-none text-foreground transition hover:bg-white"
-            aria-label="Show planner"
-          >
-            +
-          </button>
-        )}
-      </div>
-
-      <section className="soft-card mb-3 rounded-[1.3rem] px-4 py-3 backdrop-blur-xl transition-all duration-300">
-        <p className="text-xs uppercase tracking-[0.24em] text-muted">Saved Trips</p>
-        {savedTrips.length ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {savedTrips.map((trip) => (
-              <div
-                key={`saved-${trip.id}`}
-                className={`inline-flex items-center gap-0 rounded-full border px-0 py-0 text-xs transition ${
-                  currentTrip?.id === trip.id
-                    ? "border-accent bg-accent text-white"
-                    : "border-line bg-white/55 text-foreground hover:bg-white"
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => loadTrip(trip)}
-                  className="px-2.5 py-1"
-                >
-                  {trip.location}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTripPendingDelete(trip)}
-                  className={`-ml-1 flex h-5 w-5 items-center justify-center rounded-full ${
+    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 pb-28 pt-6 sm:px-6 lg:px-10">
+      {/* ── Top nav ── */}
+      <header className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="font-display text-xl font-semibold text-foreground tracking-tight">Tripr</span>
+          {savedTrips.length > 0 && (
+            <div className="hidden sm:flex items-center gap-1.5 ml-2">
+              {savedTrips.map((trip) => (
+                <div
+                  key={`saved-${trip.id}`}
+                  className={`group inline-flex items-center rounded-full border text-[11px] font-medium transition ${
                     currentTrip?.id === trip.id
-                      ? "text-white/90 hover:bg-white/10"
-                      : "text-muted hover:bg-white"
+                      ? "border-accent bg-accent text-white"
+                      : "border-line bg-white/60 text-foreground hover:bg-white"
                   }`}
-                  aria-label={`Delete saved trip ${trip.location}`}
                 >
-                  {"\u00d7"}
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-2 text-sm text-muted">Saved trips will appear here.</p>
-        )}
-      </section>
+                  <button type="button" onClick={() => loadTrip(trip)} className="px-3 py-1.5">
+                    {trip.location}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTripPendingDelete(trip)}
+                    className={`-ml-1 mr-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition ${
+                      currentTrip?.id === trip.id ? "text-white/80" : "text-muted"
+                    }`}
+                    aria-label={`Delete saved trip ${trip.location}`}
+                  >
+                    {"\u00d7"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {showPlanner ? (
+            <button
+              type="button"
+              onClick={() => setShowPlanner(false)}
+              className="rounded-full border border-line bg-white/70 px-4 py-2 text-xs font-semibold text-foreground transition hover:bg-white"
+            >
+              Cancel
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={openPlanner}
+              className="flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-white transition hover:opacity-85"
+              aria-label="Plan new trip"
+            >
+              <span className="text-base leading-none">+</span>
+              New trip
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* ── Mobile saved trips ── */}
+      {savedTrips.length > 0 && (
+        <div className="mb-5 flex sm:hidden flex-wrap gap-1.5">
+          {savedTrips.map((trip) => (
+            <div
+              key={`saved-mobile-${trip.id}`}
+              className={`inline-flex items-center rounded-full border text-[11px] font-medium transition ${
+                currentTrip?.id === trip.id
+                  ? "border-accent bg-accent text-white"
+                  : "border-line bg-white/60 text-foreground"
+              }`}
+            >
+              <button type="button" onClick={() => loadTrip(trip)} className="px-3 py-1.5">
+                {trip.location}
+              </button>
+              <button
+                type="button"
+                onClick={() => setTripPendingDelete(trip)}
+                className={`-ml-1 mr-2 text-[10px] ${currentTrip?.id === trip.id ? "text-white/80" : "text-muted"}`}
+                aria-label={`Delete ${trip.location}`}
+              >
+                {"\u00d7"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div
         className={`mt-4 grid gap-4 transition-all duration-300 ${
@@ -560,11 +579,10 @@ export function TriprApp() {
             </h2>
           </div>
 
-          <div className="mt-4 rounded-[1.35rem] bg-white/42 p-3 sm:p-4">
-            <form className="space-y-4" onSubmit={handleGenerateTrip}>
+          <form className="space-y-4" onSubmit={handleGenerateTrip}>
               <InputField
                 label="Destination"
-                placeholder="Enter travel destination here"
+                placeholder="City, country, or region"
                 value={form.location}
                 onChange={(value) => setForm((current) => ({ ...current, location: value }))}
               />
@@ -592,74 +610,66 @@ export function TriprApp() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 rounded-[1.15rem] border border-line bg-white/60 px-3.5 py-3 text-sm">
-                <TripLengthItem label="Days" value={stayLength ? String(stayLength.days) : "-"} />
-                <TripLengthItem
-                  label="Nights"
-                  value={stayLength ? String(stayLength.nights) : "-"}
-                />
-              </div>
+              {stayLength && (
+                <div className="flex gap-4 rounded-[1rem] border border-line bg-white/50 px-4 py-3 text-sm">
+                  <TripLengthItem label="Days" value={String(stayLength.days)} />
+                  <div className="w-px bg-line" />
+                  <TripLengthItem label="Nights" value={String(stayLength.nights)} />
+                </div>
+              )}
 
               <InputField
                 label="Budget"
-                placeholder="Enter total trip budget here"
+                placeholder="e.g. $2,000 total"
                 value={form.budget}
                 onChange={(value) => setForm((current) => ({ ...current, budget: value }))}
               />
               <InputField
                 label="Interests"
-                placeholder="Enter travel interests here"
+                placeholder="e.g. food, art, hiking"
                 value={form.interests}
                 onChange={(value) => setForm((current) => ({ ...current, interests: value }))}
               />
 
+              {errorMessage ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                  {errorMessage}
+                </div>
+              ) : null}
+
               <button
                 type="submit"
                 disabled={isGenerating || !stayLength}
-                className="w-full rounded-full bg-accent px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+                className="w-full rounded-full bg-accent px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isGenerating ? "Generating itinerary..." : "Generate Itinerary"}
+                {isGenerating ? "Building your itinerary…" : "Generate Itinerary"}
               </button>
             </form>
-          </div>
-
-          {errorMessage ? (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          ) : null}
         </section>
 
-        <section className="order-2 space-y-3 transition-all duration-300">
+        <section className="order-2 space-y-4 transition-all duration-300">
           {showPlanner ? null : currentTrip ? (
             <>
-              <div className="soft-card animate-rise-in rounded-[1.8rem] p-4 sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="soft-card animate-rise-in rounded-[2rem] p-5 sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <h2 className="text-2xl font-semibold text-foreground sm:text-4xl">
+                    <h2 className="font-display text-3xl font-semibold text-foreground sm:text-4xl">
                       {currentTrip.location}
                     </h2>
-                    <p className="mt-2 text-sm text-muted">{formatTripDates(currentTrip)}</p>
+                    <p className="mt-1.5 text-sm text-muted">{formatTripDates(currentTrip)}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-[11rem]">
+                  <div className="flex gap-3 sm:flex-shrink-0">
                     <MiniMetric label="Days" value={String(currentTrip.days.length)} />
-                    <MiniMetric label="Done" value={String(visitedCount)} />
+                    <MiniMetric label="Visited" value={String(visitedCount)} />
                   </div>
                 </div>
               </div>
 
               {currentTrip.hotelRecommendations?.length ? (
-                <section className="soft-card animate-rise-in rounded-[1.8rem] p-4 sm:p-5">
-                  <div className="flex items-end justify-between gap-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.22em] text-muted">Stay</p>
-                      <h3 className="mt-2 text-xl font-semibold text-foreground">
-                        Hotel Suggestions
-                      </h3>
-                    </div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted">
-                      Budget-aware
-                    </p>
+                <section className="soft-card animate-rise-in rounded-[2rem] p-5 sm:p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-semibold text-foreground">Where to Stay</h3>
+                    <span className="text-xs font-medium text-muted">Budget-aware</span>
                   </div>
                   <div className="mt-4 grid gap-3">
                     {currentTrip.hotelRecommendations.map((hotel) => (
@@ -680,30 +690,30 @@ export function TriprApp() {
                   return (
                     <article
                       key={`${currentTrip.id}-${day.day}`}
-                      className="soft-card animate-rise-in overflow-hidden rounded-[1.6rem]"
+                      className="soft-card animate-rise-in overflow-hidden rounded-[2rem]"
                     >
                       <button
                         type="button"
                         onClick={() => toggleDay(day.day)}
-                        className="flex w-full flex-col gap-3 px-4 py-4 text-left transition-colors hover:bg-white/18 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+                        className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-white/20"
                       >
-                        <div className="min-w-0">
-                          <p className="text-xs uppercase tracking-[0.2em] text-muted">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
                             Day {day.day}
                           </p>
-                          <h3 className="mt-2 text-lg font-semibold text-foreground sm:text-xl">
+                          <h3 className="mt-1.5 text-lg font-semibold text-foreground">
                             {day.theme}
                           </h3>
-                          <p className="mt-2 text-sm leading-6 text-muted">{day.summary}</p>
+                          <p className="mt-1 text-sm leading-6 text-muted">{day.summary}</p>
                         </div>
-                        <div className="w-fit rounded-full bg-accent-soft px-4 py-2 text-sm font-medium text-accent-strong">
-                          {isOpen ? "Hide" : "View"}
-                        </div>
+                        <span className={`mt-1 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold transition ${isOpen ? "bg-foreground text-white" : "bg-white/70 text-foreground border border-line"}`}>
+                          {isOpen ? "−" : "+"}
+                        </span>
                       </button>
 
                       {isOpen ? (
-                        <div className="border-t border-line px-4 py-4 sm:px-5 sm:py-4">
-                          <div className="space-y-2.5">
+                        <div className="border-t border-line px-5 py-4">
+                          <div className="space-y-2">
                             {day.activities.map((activity, activityIndex) => {
                               const activityKey = `${currentTrip.id}-${day.day}-${activityIndex}`;
                               const isActivityOpen = expandedActivities.includes(activityKey);
@@ -711,72 +721,61 @@ export function TriprApp() {
                               return (
                                 <article
                                   key={`${day.day}-${activity.title}-${activityIndex}`}
-                                  className={`rounded-[1.25rem] border px-4 py-3.5 transition ${
+                                  className={`rounded-[1.5rem] border px-4 py-3.5 transition ${
                                     activity.visited
-                                      ? "border-accent/20 bg-accent-soft/60"
-                                      : "border-line bg-white/60 hover:bg-white"
+                                      ? "border-accent/20 bg-accent-soft/50"
+                                      : "border-line bg-white/60 hover:bg-white/90"
                                   }`}
                                 >
-                                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="flex items-start justify-between gap-4">
                                     <div className="min-w-0 flex-1">
-                                      <p className="text-xs uppercase tracking-[0.18em] text-muted">
+                                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
                                         {activity.time}
                                       </p>
-                                      <div className="mt-1.5 flex items-start justify-between gap-3">
+                                      <div className="mt-1">
                                         <h4
-                                          className={`text-base font-semibold ${
-                                            activity.visited ? "line-through opacity-75" : ""
+                                          className={`text-sm font-semibold leading-snug ${
+                                            activity.visited ? "line-through opacity-60" : ""
                                           }`}
                                         >
                                           {activity.title}
                                         </h4>
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleActivity(activityKey)}
-                                          className="flex h-6 w-6 items-center justify-center text-muted transition hover:text-foreground"
-                                          aria-label={
-                                            isActivityOpen
-                                              ? `Hide description for ${activity.title}`
-                                              : `Show description for ${activity.title}`
-                                          }
-                                        >
-                                          <span className="text-sm leading-none">
-                                            {isActivityOpen ? "\u2191" : "\u2193"}
-                                          </span>
-                                        </button>
                                       </div>
                                       {isActivityOpen ? (
-                                        <p
-                                          className={`mt-2 text-sm leading-6 text-muted ${
-                                            activity.visited ? "line-through opacity-75" : ""
-                                          }`}
-                                        >
+                                        <p className={`mt-1.5 text-sm leading-6 text-muted ${activity.visited ? "line-through opacity-60" : ""}`}>
                                           {activity.description}
                                         </p>
                                       ) : null}
                                     </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleVisited(dayIndex, activityIndex)}
-                                      className="inline-flex w-full items-center justify-between gap-3 rounded-full bg-white/70 px-3 py-2 sm:w-auto sm:flex-col sm:items-end sm:bg-transparent sm:px-0 sm:py-0"
-                                      aria-pressed={activity.visited}
-                                      aria-label={`Mark ${activity.title} as ${activity.visited ? "not visited" : "visited"}`}
-                                    >
-                                      <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
-                                        {activity.visited ? "Visited" : "Not visited"}
-                                      </span>
-                                      <span
-                                        className={`relative h-7 w-12 rounded-full transition duration-200 ${
-                                          activity.visited ? "bg-accent/80" : "bg-foreground/12"
-                                        }`}
+                                    <div className="flex flex-shrink-0 flex-col items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleVisited(dayIndex, activityIndex)}
+                                        className="flex-shrink-0"
+                                        aria-pressed={activity.visited}
+                                        aria-label={`Mark ${activity.title} as ${activity.visited ? "not visited" : "visited"}`}
                                       >
                                         <span
-                                          className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-all duration-200 ${
-                                            activity.visited ? "left-[1.45rem]" : "left-1"
+                                          className={`relative block h-6 w-10 rounded-full transition duration-200 ${
+                                            activity.visited ? "bg-accent" : "bg-foreground/15"
                                           }`}
-                                        />
-                                      </span>
-                                    </button>
+                                        >
+                                          <span
+                                            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-all duration-200 ${
+                                              activity.visited ? "left-[1.2rem]" : "left-0.5"
+                                            }`}
+                                          />
+                                        </span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleActivity(activityKey)}
+                                        className="flex h-6 w-6 items-center justify-center text-sm text-muted transition hover:text-foreground"
+                                        aria-label={isActivityOpen ? `Hide description for ${activity.title}` : `Show description for ${activity.title}`}
+                                      >
+                                        {isActivityOpen ? "\u2191" : "\u2193"}
+                                      </button>
+                                    </div>
                                   </div>
                                 </article>
                               );
@@ -790,15 +789,14 @@ export function TriprApp() {
               </div>
             </>
           ) : (
-            <div className="soft-card animate-rise-in flex min-h-[300px] flex-col justify-end rounded-[1.8rem] p-5 sm:p-7">
-              <div className="max-w-lg">
-                <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-                  Your itinerary will appear here.
-                </h2>
-                <p className="mt-4 text-sm leading-6 text-muted">
-                  Open the planner with the + button to generate a trip.
-                </p>
-              </div>
+            <div className="soft-card animate-rise-in flex min-h-[360px] flex-col justify-center rounded-[2rem] p-8 text-center sm:p-10">
+              <p className="font-display text-4xl text-foreground/10 sm:text-5xl">✈</p>
+              <h2 className="mt-4 font-display text-2xl font-semibold text-foreground sm:text-3xl">
+                Where to next?
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-muted">
+                Hit <strong className="text-foreground font-semibold">+ New trip</strong> above to generate a complete day-by-day itinerary in seconds.
+              </p>
             </div>
           )}
         </section>
@@ -808,9 +806,10 @@ export function TriprApp() {
         <button
           type="button"
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-4 right-4 z-30 rounded-full bg-foreground px-4 py-3.5 text-sm font-semibold text-white shadow-2xl transition hover:translate-y-[-2px] sm:bottom-6 sm:right-8"
+          className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-full bg-foreground px-5 py-3.5 text-sm font-semibold text-white shadow-2xl transition hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(30,26,23,0.35)] sm:bottom-7 sm:right-8"
         >
-          Open assistant
+          <span className="text-base">💬</span>
+          Ask assistant
         </button>
       ) : null}
 
@@ -944,52 +943,51 @@ function LandingPage({
   onResumeTrip: () => void;
 }) {
   return (
-    <section className="animate-rise-in glass relative overflow-hidden rounded-[2.5rem] px-5 pb-10 pt-6 sm:px-8 sm:pb-12 sm:pt-8">
+    <section className="animate-rise-in glass relative overflow-hidden rounded-[2.5rem] px-6 pb-12 pt-8 sm:px-10 sm:pb-16 sm:pt-12">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.82),transparent_18%),radial-gradient(circle_at_82%_18%,rgba(188,91,56,0.22),transparent_18%),linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.08)_100%)]" />
-      <div className="relative flex flex-col gap-10">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+      <div className="relative flex flex-col gap-12">
+        <div className="grid gap-12 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="text-xs uppercase tracking-[0.34em] text-muted">Tripr</p>
-            <h1 className="mt-5 font-display text-5xl leading-[0.92] text-foreground sm:text-6xl lg:text-8xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-accent">Tripr</p>
+            <h1 className="mt-6 font-display text-5xl leading-[1] text-foreground sm:text-6xl lg:text-[5.5rem]">
               Plan the trip.
               <br />
-              Talk to the trip.
+              <em className="not-italic text-accent">Talk</em> to the trip.
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-8 text-muted">
-              Tripr creates a complete itinerary in seconds, then stays with you as a travel
-              assistant that can explain, simplify, swap, and refine every day.
+            <p className="mt-6 max-w-lg text-base leading-8 text-muted">
+              A complete day-by-day itinerary in seconds — then a travel assistant that explains, adjusts, and refines every detail with you.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
                 type="button"
                 onClick={onGetStarted}
-                className="rounded-full bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition hover:translate-y-[-1px]"
+                className="rounded-full bg-foreground px-7 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_12px_32px_rgba(30,26,23,0.28)]"
               >
-                Get started
+                Start planning
               </button>
               {hasSavedTrips ? (
                 <button
                   type="button"
                   onClick={onResumeTrip}
-                  className="rounded-full border border-line bg-white/55 px-6 py-3.5 text-sm font-semibold text-foreground transition hover:bg-white"
+                  className="rounded-full border border-line bg-white/55 px-7 py-3.5 text-sm font-semibold text-foreground transition hover:bg-white"
                 >
-                  Resume trip
+                  Resume last trip
                 </button>
               ) : null}
             </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className="flex flex-col gap-3 lg:w-64">
             <HeroCard
-              eyebrow="Instant structure"
+              eyebrow="Structured"
               title="Morning to evening, day by day."
-              body="Tripr returns a complete itinerary instead of scattered suggestions."
+              body="Full itineraries, not scattered suggestions."
             />
             <HeroCard
-              eyebrow="Conversational control"
-              title="Ask questions or make edits naturally."
-              body="Use chat for both planning advice and full itinerary updates."
+              eyebrow="Conversational"
+              title="Edit anything with a message."
+              body="Ask questions or request changes in plain language."
             />
           </div>
         </div>
@@ -1019,7 +1017,7 @@ function getStayLength(arrivalDate: string, departureDate: string) {
   const departure = new Date(`${departureDate}T00:00:00`);
   const difference = departure.getTime() - arrival.getTime();
 
-  if (Number.isNaN(arrival.getTime()) || Number.isNaN(departure.getTime()) || difference <= 0) {
+  if (Number.isNaN(arrival.getTime()) || Number.isNaN(departure.getTime()) || difference < 0) {
     return null;
   }
 
@@ -1091,19 +1089,19 @@ function HeroCard({
   body: string;
 }) {
   return (
-    <div className="rounded-[1.75rem] border border-white/55 bg-white/58 p-5 shadow-[0_12px_36px_rgba(70,44,21,0.08)]">
-      <p className="text-xs uppercase tracking-[0.2em] text-muted">{eyebrow}</p>
-      <h2 className="mt-3 text-2xl font-semibold text-foreground">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-muted">{body}</p>
+    <div className="rounded-[1.5rem] border border-white/60 bg-white/52 p-5 shadow-[0_8px_28px_rgba(70,44,21,0.07)]">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-accent">{eyebrow}</p>
+      <h2 className="mt-2 text-base font-semibold leading-snug text-foreground">{title}</h2>
+      <p className="mt-1.5 text-sm leading-6 text-muted">{body}</p>
     </div>
   );
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[1.1rem] border border-line bg-white/55 px-3.5 py-3">
-      <p className="text-[11px] uppercase tracking-[0.16em] text-muted">{label}</p>
-      <p className="mt-1 text-base font-semibold text-foreground">{value}</p>
+    <div className="rounded-[1.25rem] border border-line bg-white/60 px-4 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }

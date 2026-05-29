@@ -4,6 +4,17 @@ title Tripr Launcher
 
 cd /d "%~dp0"
 
+set "NODEJS_DIR=C:\Program Files\nodejs"
+set "COREPACK_CMD=corepack"
+
+if exist "%NODEJS_DIR%\node.exe" (
+  set "PATH=%NODEJS_DIR%;%PATH%"
+)
+
+if exist "%NODEJS_DIR%\corepack.cmd" (
+  set "COREPACK_CMD=%NODEJS_DIR%\corepack.cmd"
+)
+
 echo =====================================
 echo Starting Tripr from:
 echo %cd%
@@ -21,11 +32,13 @@ if errorlevel 1 (
 
 where corepack >nul 2>nul
 if errorlevel 1 (
-  echo Corepack is not available on PATH.
-  echo Reinstall or update Node.js, then try again.
-  echo.
-  pause
-  exit /b 1
+  if not exist "%NODEJS_DIR%\corepack.cmd" (
+    echo Corepack is not available on PATH.
+    echo Reinstall or update Node.js, then try again.
+    echo.
+    pause
+    exit /b 1
+  )
 )
 
 if not exist ".env.local" (
@@ -57,7 +70,7 @@ if "%NEEDS_INSTALL%"=="1" (
     rmdir /s /q ".next"
   )
 
-  call cmd /c corepack pnpm install
+  call "%COREPACK_CMD%" pnpm install
   if errorlevel 1 (
     echo.
     echo Dependency repair failed.
@@ -72,6 +85,13 @@ echo Launching Tripr on http://localhost:3000
 echo Keep this window open while using the app.
 echo.
 
-call cmd /k "cd /d ""%cd%"" && corepack pnpm dev"
+call "%COREPACK_CMD%" pnpm dev
+if errorlevel 1 (
+  echo.
+  echo Tripr stopped because the dev server exited with an error.
+  echo.
+  pause
+  exit /b 1
+)
 
 
